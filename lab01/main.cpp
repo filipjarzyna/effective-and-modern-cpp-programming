@@ -101,6 +101,20 @@ public:
     m.rows = 0;
     m.cols = 0;
   }
+
+  Matrix &operator=(Matrix &&m) {
+    printf("move assignment\n");
+    if (this == &m)
+      return *this;
+    delete[] arr;
+    rows = m.rows;
+    cols = m.cols;
+    arr = m.arr;
+    m.rows = 0;
+    m.cols = 0;
+    m.arr = nullptr;
+    return *this;
+  }
 };
 
 class MatrixWithLabel : public Matrix {
