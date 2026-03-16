@@ -7,7 +7,7 @@ using namespace std;
 class Container : public Box {
  public:
     static bool verbose;
-    Container(int content){}
+    Container(int content): Box(content){}
     Container(const Container & container) : Box(container){
         if(verbose) cout << "Container: copy constructor.\n";
     }

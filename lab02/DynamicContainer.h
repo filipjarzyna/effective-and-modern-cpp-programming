@@ -10,11 +10,11 @@ class Container{
   std::unique_ptr<Box> pbox;
 public:
     static bool verbose;
-    Container(int content): pbox(new Box){
+    Container(int content): pbox(make_unique<Box>(content)){
         if(verbose) cout << "Creating Container" << endl;
         pbox->setContent(content);
     }
-    Container(const Container & container): pbox(new Box{*(container.pbox)}){
+    Container(const Container & container): pbox(make_unique<Box>(*container.pbox)){
         if(verbose) cout << "Creating copy of Container\n";
     }
     Container & operator=(const Container &container){
@@ -23,6 +23,12 @@ public:
             *pbox = *container.pbox;
         }
         return *this;
+    }
+    // Move Assignment Operator
+    Container & operator=(Container && container) {
+      if (this != &container)
+        pbox = std::move(container.pbox); 
+      return *this;
     }
 
     Container(Container && container) : pbox(std::move(container.pbox)){
