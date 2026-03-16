@@ -12,6 +12,8 @@ class Container : public Box {
         if(verbose) cout << "Container: copy constructor.\n";
     }
     Container & operator=(const Container &container){
+      if(this != &container)
+        Box::operator=(container);
 	    if(verbose) cout << "Container: copy assignment.\n";
 		return *this;
     }
@@ -19,6 +21,8 @@ class Container : public Box {
 		if(verbose) cout << "Container: move constructor.\n";
   	}
   	Container & operator=(Container && container){
+      if(this != &container)
+        Box::operator=(std::move(container));
 		if(verbose) cout << "Container: move assignment.\n";
 		return *this;
   	}

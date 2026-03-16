@@ -23,7 +23,7 @@ public:
 
     /// makes a copy of a string if it has more than one reference.
     void set(int index, char ch) {
-      if (!ptr.unique()) {
+      if (ptr.use_count() > 1) {
         ptr = make_shared<string>(*ptr);
       }
       (*ptr)[index] = ch; 
