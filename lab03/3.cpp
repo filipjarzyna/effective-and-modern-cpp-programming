@@ -1,11 +1,22 @@
 #include <iostream>
+#include <ostream>
 #include <vector>
 #include <fstream>
 #include <algorithm>
 
 using namespace std;
 class Printer{
-	/// TODO
+private:
+  string prefix;
+  string sufix;
+  ostream& ostr;
+public:
+  Printer(ostream& s, string prefix, string sufix): ostr(s), prefix(prefix), sufix(sufix) {
+  }
+  template<typename T>
+  void operator()(const T& x) {
+    ostr << prefix << x << sufix;
+  }
 };
 
 int main(){
