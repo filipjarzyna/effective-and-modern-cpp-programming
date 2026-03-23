@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include <list>
@@ -22,7 +23,9 @@ int main(){
 
   /// 1. Sort v with respect to the distance to the center (closest first)
   int center = 50;
-  std::sort(v.begin(), v.end(), [](){});            // 1
+  std::sort(v.begin(), v.end(), [center](int a, int b){
+      return abs(a - center) < abs(b - center);
+      });            // 1
   print(v, "center 50:");
 
 
@@ -31,7 +34,20 @@ int main(){
   ///  - if numbers have the same sign then odd numbers are after even ones
   /// e.g.  4  < 8 < 1 < 3 < 0 <  -8 < -2 < -7 < -3
 
-  auto positiveEvenFirst= [](){};                  // 2
+  auto positiveEvenFirst= [](int a, int b){
+    bool diffSigns = a * b <= 0;
+    if (diffSigns)
+      return b < a;
+
+    bool aIsEven = a % 2 == 0;
+    bool bIsEven = b % 2 == 0;
+    if(aIsEven && !bIsEven) 
+      return true;
+    if(bIsEven && !aIsEven)
+      return false;
+
+    return a < b;
+  };                  // 2
   std::sort(v.begin(), v.end(), positiveEvenFirst);
   print(v, "positiveEven:");
 
@@ -54,7 +70,10 @@ int main(){
   /// Changing values of a or b should change the interval used by generator.
   srand(2022);
   int a = 0, b = 40;
-  auto generator = []{};  /// 3
+  auto generator = [&a, &b]{
+    int rangeLen = b - a + 1;
+    return (rand() % rangeLen) + a;
+  };  /// 3
 
   std::generate(v.begin(), v.end(), generator);
   print(v, "generator [0,40]:");
@@ -67,7 +86,11 @@ int main(){
   /// Changing start does not change the beginning of the sequence
   /// but a change of step influences the function output.
   int start = 5, step =2;
-  auto arithmeticGenerator =  [](){} ;                   // [ 4 ]
+  auto arithmeticGenerator =  [cur = start, &step]() mutable {
+    int value = cur;
+    cur += step;
+    return value;
+  } ;                   // [ 4 ]
   std::generate(v.begin(), v.end(), arithmeticGenerator );
   print(v, "arithm [5,2] :");
 
@@ -79,7 +102,11 @@ int main(){
   /// 5. Function that for given standard container (vector, list, deque)
   ///  computes l1 norm i.e. the sum of the absolute values of elements in the container.
   ///  Try to use std::accumulate algorithm with another lambda expression to implement it.
-  auto l1_norm = [](){}; ;                           // [ 5 ]
+  auto l1_norm = [](auto v){
+    return std::accumulate(v.begin(), v.end(), 0.0, [](auto a, auto b) {
+          return abs(a) + abs(b);
+        });
+  };                           // [ 5 ]
 
   cout << "l1 norm (v) : " << l1_norm(v) << endl;
   assert(l1_norm(v) == 1050);
@@ -94,6 +121,15 @@ int main(){
   /// a function with one parameter x that computes
   /// a value of a polynomial of degree n with coefficients a at the point x.
   auto polynomial = [](double * a, int n){
+    return [a, n](double x) {
+      double res = 0;
+      for (int i = 0; i <= n; ++i)
+      {
+        res *= x;
+        res += a[n - i];
+      }
+      return res;
+    };
   };   // ( 6 )
 
   double c[] = {1, 2, 3, 4, 5};
