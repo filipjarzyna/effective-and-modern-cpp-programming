@@ -8,7 +8,14 @@ struct Rational{
   }
 };
 
-
+template<typename T>
+int compare(T a, T b) {
+  if(b < a)
+    return -1;
+  if(a < b)
+    return 1;
+  return 0;
+}
 
 int main(){
   int a = 1, b=-6;

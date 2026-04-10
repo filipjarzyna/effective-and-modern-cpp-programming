@@ -1,13 +1,63 @@
+#include <functional>
 #include <iostream>
+#include <iterator>
 #include <vector>
 #include <list>
 #include <cmath>
 using namespace std;
 
+template<typename T>
+T sqr(T a){
+  return a * a;
+}
+
+template <>
+string sqr(string a) {
+  return a + a;
+}
+
+template<int N>
+int mod(int a, int b){
+  if (N == 0)
+    return a + b;
+  return (a + b) % N;
+}
+
+template<typename Container>
+void print(const Container & v) {
+  auto it = begin(v);
+  auto end = std::end(v);
+  while(it != end) {
+    cout << *it;
+    if(++it != end)
+      cout << " ";
+  }
+  cout << endl;
+}
+
+template<typename C, typename F>
+C applyFun (const C& c, F f) {
+  C result(c);
+  auto it = begin(c);
+  auto end = std::end(c);
+  auto itRes = begin(result);
+  while(it != end) {
+    *itRes = f(*it);
+    itRes++;
+    it++;
+  }
+  return result;
+}
+
+template<typename T, T (*f)(T), int N>
+void process(T array[]) {
+  for(int i = 0; i < N; i++)
+    array[i] = f(array[i]);
+}
+
 int main(){
 
   // function template  sqr<T>
-
   cout << sqr(4) << endl;             // 16
   cout << sqr(14.5) << endl;          // 210.25
   cout << sqr(string("hey")) << endl; // heyhey

@@ -1,4 +1,7 @@
+#include <algorithm>
 #include <iostream>
+#include <iterator>
+#include <memory>
 #include <vector>
 #include <list>
 #include <deque>
@@ -6,10 +9,15 @@ using namespace std;
 
 bool biggerThan5(int x){ return x>5; }
 
-/// TODO 
-template ...
-OutContainer<T,Alloc>   selectIf(InContainer<T,Alloc>  c, Predicate p){
-  // ....
+template<
+  template<typename, typename> class OutContainer,
+  template<typename, typename> class InContainer,
+  typename T, typename Alloc,
+  typename Predicate>
+OutContainer<T,Alloc> selectIf(InContainer<T,Alloc>  c, Predicate p){
+  OutContainer<T, Alloc> result;
+  copy_if(begin(c), end(c), std::back_inserter(result), p);
+  return result;
 }
 
 int main(){
