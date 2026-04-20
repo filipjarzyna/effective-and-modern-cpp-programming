@@ -16,16 +16,19 @@ string sqr(string a) {
   return a + a;
 }
 
-template<int N>
+template<unsigned int N>
 int mod(int a, int b){
-  if (N == 0)
-    return a + b;
   return (a + b) % N;
+}
+
+template<>
+int mod<0>(int a, int b){
+  return a + b;
 }
 
 template<typename Container>
 void print(const Container & v) {
-  auto it = begin(v);
+  auto it = std::begin(v);
   auto end = std::end(v);
   while(it != end) {
     cout << *it;
@@ -38,7 +41,7 @@ void print(const Container & v) {
 template<typename C, typename F>
 C applyFun (const C& c, F f) {
   C result(c);
-  auto it = begin(c);
+  auto it = std::begin(c);
   auto end = std::end(c);
   auto itRes = begin(result);
   while(it != end) {

@@ -85,12 +85,12 @@ int main(){
   /// 4. Function that generates arithmetic sequence with given start value and step.
   /// Changing start does not change the beginning of the sequence
   /// but a change of step influences the function output.
-  int start = 5, step =2;
+  int start = 5, step = 2;
   auto arithmeticGenerator =  [cur = start, &step]() mutable {
     int value = cur;
     cur += step;
     return value;
-  } ;                   // [ 4 ]
+  };                   // [ 4 ]
   std::generate(v.begin(), v.end(), arithmeticGenerator );
   print(v, "arithm [5,2] :");
 
