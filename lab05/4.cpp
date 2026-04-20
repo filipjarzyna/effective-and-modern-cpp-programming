@@ -11,7 +11,7 @@ using DWektor = Vector<double, 0>;
 int main(){
     cout <<fixed << setprecision(2);
 
-	DWektor m1 = {1,  2,  3};    // dynamic z initialization_list
+    DWektor m1 = {1,  2,  3};    // dynamic z initialization_list
 	cout << m1 << endl;
 
 	SWektor<3> m2 = {1, -1, 0};  // static

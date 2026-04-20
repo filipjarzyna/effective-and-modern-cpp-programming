@@ -1,4 +1,4 @@
-#include "solutions/staticVector.h"
+#include "staticVector.h"
 #include <iomanip>
 #include <iostream>
 
@@ -33,10 +33,10 @@ int main() {
   return 0;
 }
 /** Expected output:
-m0 = 0.00 0.00 0.00 0.00
-m1 = 1.00 2.00 3.00 4.00
-m1 = 1.00 2.00 -5.00 -20.00
-element = 3.00
-m2.size() = 4
-m3 = 2.00 4.00 -2.00 -16.00
-*/
+  m0 = 0.00 0.00 0.00 0.00
+  m1 = 1.00 2.00 3.00 4.00
+  m1 = 1.00 2.00 -5.00 -20.00
+  element = 3.00
+  m2.size() = 4
+  m3 = 2.00 4.00 -2.00 -16.00
+  */
