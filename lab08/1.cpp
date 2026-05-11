@@ -34,7 +34,8 @@ int main() {
   for (auto it = r3.begin(); it != r3.end(); ++it)
 	cout << *it << " ";
   cout << "\n";
-  for (auto it = begin(r3), e = end(r3); e != it; it++)
+
+  for (auto it = begin(r3), e = end(r3); it != e; it++)
 	cout << *it << " ";
   cout << "\n------------\n";
 
