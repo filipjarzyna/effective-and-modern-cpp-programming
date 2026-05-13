@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include <vector>
 using namespace std;
 /**
@@ -9,24 +11,64 @@ using namespace std;
  *       My implementation adds less than 25 lines of code. 
  */
 class Trie{
-  /// TODO:
+private:
+    std::map<std::string, Trie> words;
+    bool isEnd = false;
+
 public:
     static void printSentence(const std::vector<std::string>  & sentence ){
         for(const auto & w : sentence)
             cout << w << " ";
     }
+
     void add(const std::vector<std::string>  & sentece ){
        cout << "Adding : ";
        printSentence(sentece);
        cout << "\n";
+
        /// TODO:
+       Trie* node = this;
+       for(const auto& word : sentece)
+           node = &(node->words[word]);
+        node->isEnd = true;
     }
-    void printPossibleEndings(const std::vector<std::string>  & beginningOfSentece ){
+
+    void printPossibleEndings(const std::vector<std::string>  & beginningOfSentece){
         cout << "Endings for \"";
         printSentence(beginningOfSentece);
         cout << "\" are :\n";
+
         // TODO:
+        vector<string> wordStack(beginningOfSentece);
+        std::reverse(wordStack.begin(), wordStack.end());
+        vector<string> current;
+        printAll(wordStack, current);
     }
+
+    void printAll(vector<string> wordStack, vector<string>& current) {
+        if(wordStack.empty()) {
+            if(isEnd){
+                cout << " > ";
+                printSentence(current);
+                cout << "\n";
+            }
+
+            for(auto& [word, child] : words){
+                current.push_back(word);
+                child.printAll(wordStack, current);
+                current.pop_back();
+            }
+        } else {
+            std::string wordMatch = wordStack.back();
+            wordStack.pop_back();
+            for(auto& [word, child] : words){
+                if(wordMatch != word) continue;
+                child.printAll(wordStack, current);
+            }
+        }
+
+    }
+
     void load(const std::string & fileName){
         ifstream file(fileName);
         if(!file){
