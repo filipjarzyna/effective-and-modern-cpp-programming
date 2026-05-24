@@ -1,12 +1,36 @@
 #include <iostream>
 #include <typeinfo>
-#include <boost/type_index.hpp>
 using namespace std;
 
 double f(int x, double y, const int & z, int & w){
     w += 2;
     cout << x << " " << y<< " " << z << " " << w <<endl;
     return (x*y - z*w);
+}
+
+template<typename... Types>
+void showNames(Types... args) {
+    int i = 1;
+    ((cout << i++ << " < " << typeid(args).name()  << " = " << args << endl), ...);
+}
+
+template<typename T>
+class Proxy {
+private:
+    T func;
+public:
+    Proxy(T f): func(f) {}
+
+    template<typename... Args>
+    auto operator()(Args&&... args) {
+        showNames(args...);
+        return func(std::forward<Args>(args)...);
+    }
+};
+
+template<typename T>
+Proxy<T> make_proxy(T f) {
+    return Proxy<T>(f);
 }
 
 int main(){

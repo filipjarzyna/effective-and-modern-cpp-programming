@@ -4,15 +4,18 @@ using namespace std;
 
 /* Colors */
 class Red{
-public:     static constexpr char color[] = "red";
+public:
+    static constexpr char color[] = "red";
 };
 
 class Yellow{
-public:     static constexpr char color[] = "yellow";
+public:
+    static constexpr char color[] = "yellow";
 };
 
 class Blue{
-public:     static constexpr char color[] = "blue";
+public:
+    static constexpr char color[] = "blue";
 };
 
 /* Shapes*/
@@ -42,6 +45,12 @@ public:
     }
 };
 
+template<class ...Ts>
+class Mixins : public Ts... {
+public:
+    Mixins(Ts&&... args) : Ts(std::forward<Ts>(args))... {}
+};
+
 int main(){
 
     using RedCircle = Mixins<Red, Circle>;
@@ -49,7 +58,7 @@ int main(){
     cout << x.color << " area = " << x.area() << endl;
 
     using BlueRectangleWithNotes = Mixins<Blue, Rectangle, Note>;
-    RedCicleWithNotes y (Blue{}, Rectangle{3,4}, Note{"Hey"});
+    BlueRectangleWithNotes y (Blue{}, Rectangle{3,4}, Note{"Hey"});
     y.add("Ho");
     cout << y.color << " area = " << y.area() << endl;
 

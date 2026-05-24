@@ -7,7 +7,22 @@ int f(int x){
     return x*x;
 }
 int cube(int x){
-    return x*x*X;
+    return x*x*x;
+}
+
+template<typename... Types>
+double average(Types... args) {
+    return double((args + ...)) / sizeof...(args);
+}
+
+template <typename... Types>
+int computeSum(int (*func)(int), Types... args) {
+    return (func(args) + ...);
+}
+
+template <typename T, typename... Types>
+void insert(std::vector<T> &v, Types... args) {
+    (v.push_back(args), ...);
 }
 
 int main(){
