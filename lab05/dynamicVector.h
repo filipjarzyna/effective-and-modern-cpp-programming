@@ -6,10 +6,16 @@
 #include <memory>
 #include <iostream>
 #include <cassert>
+#include <stdexcept>
 #include <vector>
 #include <cmath>
 
 #include "staticVector.h"
+
+class VectorException : public std::runtime_error {
+public:
+    explicit VectorException(const std::string& msg) : std::runtime_error(msg) {}
+};
 
 template <typename T>
 class Vector<T, 0> {
@@ -24,6 +30,7 @@ public:
     typedef const T& const_reference;
 
     Vector() = default;
+
     Vector(size_t size):
         data(std::make_unique<value_type[]>(size)),
         numOfElem(size) {}
@@ -56,14 +63,15 @@ public:
     }
 
     template<size_t N>
-    Vector(Vector<T, N> v) : numOfElem(v.size()) {
+    Vector(const Vector<T, N> &v) : numOfElem(v.size()) {
         data = std::make_unique<T[]>(N);
         for(size_t i = 0; i < N; ++i)
             data[i] = v[i];
     }
 
     friend Vector operator+ (const Vector &u, const Vector& v) {
-        assert(u.size() == v.size());
+        if (u.size() != v.size())
+            throw VectorException("Vector sizes are incompatible");
         Vector res(u.size());
         for(size_type i = 0; i < u.size(); i++)
             res.data[i] = u[i] + v[i];
@@ -72,7 +80,8 @@ public:
 
     template<size_t N>
     friend Vector operator+(const Vector <T, 0> &u, const Vector<T, N> &v) {
-        assert(u.size() == N);
+        if (u.size() != v.size())
+            throw VectorException("Vector sizes are incompatible");
         Vector res(u.size());
         for (size_type i = 0; i < N; ++i)
             res.data[i] = u[i] + v[i];

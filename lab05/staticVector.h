@@ -42,28 +42,21 @@ public:
             data[i++] = k;
     }
 
-    Vector(const Vector<T, 0>& v) {
-        assert(N == v.size());
-        for(size_type i = 0; i < N; i++)
-            data[i] = v[i];
-    }
-
-    friend Vector operator+(const Vector &u, const Vector<T, 0> &v) {
-        assert(v.size() == N);
-        Vector res;
-        for (size_type i = 0; i < N; ++i)
-            res.data[i] = u[i] + v[i];
-        return res;
-    }
-
     template<typename S, size_t M>
-    Vector(const Vector<S, M>& v) {
-        assert(M == N);
+    explicit Vector(const Vector<S, M>& v) {
+        static_assert(M == N, "incompatible dimensions");
         for(size_t i = 0; i < N; i++)
             data[i] = static_cast<T>(v[i]);
     }
 
-    friend Vector operator+ (const  Vector & u, const Vector & v ) {
+    template<typename S>
+    Vector(const Vector<S, 0>& v) {
+        assert(v.size() == this->size());
+        for(size_t i = 0; i < N; i++)
+            data[i] = static_cast<T>(v[i]);
+    }
+
+    friend Vector operator+(const  Vector & u, const Vector & v) {
         Vector res;
         for(size_type i = 0; i < u.size(); i++)
             res.data[i] = u[i] + v[i];
