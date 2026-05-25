@@ -1,6 +1,5 @@
 #include <iostream>
 #include <limits>
-#include <typeinfo>
 using  namespace std;
 /**
  * Outputs information about numerical type T:

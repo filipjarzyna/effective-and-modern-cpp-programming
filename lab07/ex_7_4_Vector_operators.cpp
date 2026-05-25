@@ -1,37 +1,115 @@
 #include <iostream>
+#include <type_traits>
 using namespace std;
 
-template <int N>
-class Vector{
-  int data[N];
- public:
-  Vector(){
-	cout << " Default constr" << endl;
-  }
-  Vector(std::initializer_list<int> list){
-	cout << " Init list constr" << endl;
-	auto it = list.begin();
-	for(int i=0; i<N; i++) {
-	  data[i] = *it++;
-	}
-  }
-  Vector(const Vector & m){
-	std::copy(m.data, m.data+N, data);
-	cout << " Copy constr" << endl;
-  }
-  int operator[](int index) const {
-	return data[index];
-  }
-  int & operator[](int index){
-	return data[index];
-  }
+template<typename Op, typename L, typename R>
+class LazyEval {
+private:
+    const L& left;
+    const R& right;
+    using operation = Op;
+public:
+    LazyEval(const L& l, const R& r): left(l), right(r) {}
 
-  friend ostream & operator << (ostream & out, const Vector & m){
-	for(auto x : m.data){
-	  cout << x << ", ";
-	}
-	return out;
-  }
+    int operator[](int x) const {
+        if constexpr(is_arithmetic<L>()) {
+            return operation{}(left, right[x]);
+        } else if constexpr (is_arithmetic<R>()) {
+            return operation{}(left[x], right);
+        } else {
+            return operation{}(left[x], right[x]);
+        }
+    }
+};
+
+struct Add {
+    int operator()(int i, int j) const {
+        return i + j;
+    }
+};
+
+struct Multi {
+    int operator()(int i, int j) const {
+        return i * j;
+    }
+};
+
+struct Subtraction {
+    int operator()(int i, int j) const {
+        return i - j;
+    }
+};
+
+template<typename L, typename R>
+using AddExpr = LazyEval<Add, L, R>;
+
+template<typename L, typename R>
+using MultiExpr = LazyEval<Multi, L, R>;
+
+template<typename L, typename R>
+using SubtrExpr = LazyEval<Subtraction, L, R>;
+
+template<typename L, typename R>
+AddExpr<L,R> operator+(const L& l, const R& r) {
+    return AddExpr<L,R>(l, r);
+}
+
+template<typename L, typename R>
+MultiExpr<L,R> operator*(const L& l, const R& r) {
+    return MultiExpr<L,R>(l, r);
+}
+
+template<typename L, typename R>
+SubtrExpr<L,R> operator-(const L& l, const R& r) {
+    return SubtrExpr<L,R>(l, r);
+}
+
+template <int N>
+class Vector {
+    int data[N];
+public:
+    Vector() {
+        for (int i = 0; i < N; ++i) data[i] = 0;
+        cout << " Default constr" << endl;
+    }
+    Vector(std::initializer_list<int> list) {
+        cout << " Init list constr" << endl;
+        auto it = list.begin();
+        for (int i = 0; i < N && it != list.end(); i++) {
+            data[i] = *it++;
+        }
+    }
+    Vector(const Vector& m) {
+        std::copy(m.data, m.data + N, data);
+        cout << " Copy constr" << endl;
+    }
+    template <typename Expr>
+    Vector(const Expr& expr) {
+        cout << " Default constr" << endl;
+        for (int i = 0; i < N; ++i) {
+            data[i] = expr[i];
+        }
+    }
+    int operator[](int index) const {
+        return data[index];
+    }
+    int& operator[](int index) {
+        return data[index];
+    }
+    friend ostream& operator<<(ostream& out, const Vector& m) {
+        for (int i = 0; i < N; i++) {
+            out << m.data[i] << (i == N - 1 ? "" : ", ");
+        }
+        return out;
+    }
+
+    template<typename Op, typename L, typename R>
+        Vector& operator=(const LazyEval<Op, L, R>& expr) {
+            for(int i = 0; i < N; ++i)
+                data[i] = expr[i];
+
+            return *this;
+        }
 };
 
 

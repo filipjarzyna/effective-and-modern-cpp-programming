@@ -22,7 +22,7 @@ class Vector {
   typedef std::size_t  size_type;
   typedef T* pointer;
   typedef T& reference;
-  typedef typename vector_traits<T>::param_type const_reference;
+  typedef typename vector_traits<T>::param_type param_type;
   typedef typename vector_traits<T>::scalar_type scalar_type;
   using policy = P<T,N>;
 
@@ -40,12 +40,12 @@ class Vector {
 	return N;
   }
 
-  const_reference get(size_type index) const {
+  param_type get(size_type index) const {
     policy::check(index);
 	return data[index];
   }
 
-  void set(size_type index, const_reference value) {
+  void set(size_type index, param_type value) {
     policy::check(index);
 	data[index] = value;
   }
