@@ -2,52 +2,46 @@
 #include <type_traits>
 using namespace std;
 
-template<typename Op, typename L, typename R>
+
+template<int(*operation)(int,int), typename L, typename R>
 class LazyEval {
 private:
     const L& left;
     const R& right;
-    using operation = Op;
 public:
     LazyEval(const L& l, const R& r): left(l), right(r) {}
 
     int operator[](int x) const {
         if constexpr(is_arithmetic<L>()) {
-            return operation{}(left, right[x]);
+            return operation(left, right[x]);
         } else if constexpr (is_arithmetic<R>()) {
-            return operation{}(left[x], right);
+            return operation(left[x], right);
         } else {
-            return operation{}(left[x], right[x]);
+            return operation(left[x], right[x]);
         }
     }
 };
 
-struct Add {
-    int operator()(int i, int j) const {
-        return i + j;
-    }
-};
+inline int add(int i, int j) {
+    return i + j;
+}
 
-struct Multi {
-    int operator()(int i, int j) const {
-        return i * j;
-    }
-};
+inline int multiply(int i, int j) {
+    return i * j;
+}
 
-struct Subtraction {
-    int operator()(int i, int j) const {
-        return i - j;
-    }
-};
+inline int subtract(int i, int j) {
+    return i - j;
+}
 
 template<typename L, typename R>
-using AddExpr = LazyEval<Add, L, R>;
+using AddExpr = LazyEval<add, L, R>;
 
 template<typename L, typename R>
-using MultiExpr = LazyEval<Multi, L, R>;
+using MultiExpr = LazyEval<multiply, L, R>;
 
 template<typename L, typename R>
-using SubtrExpr = LazyEval<Subtraction, L, R>;
+using SubtrExpr = LazyEval<subtract, L, R>;
 
 template<typename L, typename R>
 AddExpr<L,R> operator+(const L& l, const R& r) {
@@ -111,7 +105,7 @@ public:
         return out;
     }
 
-    template<typename Op, typename L, typename R>
+    template<int(*Op)(int,int), typename L, typename R>
         Vector& operator=(const LazyEval<Op, L, R>& expr) {
             for(int i = 0; i < N; ++i)
                 data[i] = expr[i];
