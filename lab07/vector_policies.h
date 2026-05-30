@@ -19,10 +19,10 @@ template<typename T, std::size_t N>
 class CheckIndexPolicy {
 public:
     static void check(std::size_t index) {
-        if(index >= N)
+        if(index >= N) {
             std::cout << "exception" << std::endl;
-            return;
             throw std::out_of_range("index out of range");
+        }
     }
 };
 

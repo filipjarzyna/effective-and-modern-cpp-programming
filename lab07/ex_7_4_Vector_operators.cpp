@@ -66,12 +66,15 @@ SubtrExpr<L,R> operator-(const L& l, const R& r) {
 
 template <int N>
 class Vector {
+private:
     int data[N];
+
 public:
     Vector() {
         for (int i = 0; i < N; ++i) data[i] = 0;
         cout << " Default constr" << endl;
     }
+
     Vector(std::initializer_list<int> list) {
         cout << " Init list constr" << endl;
         auto it = list.begin();
@@ -79,10 +82,12 @@ public:
             data[i] = *it++;
         }
     }
+
     Vector(const Vector& m) {
         std::copy(m.data, m.data + N, data);
         cout << " Copy constr" << endl;
     }
+
     template <typename Expr>
     Vector(const Expr& expr) {
         cout << " Default constr" << endl;
@@ -90,12 +95,15 @@ public:
             data[i] = expr[i];
         }
     }
+
     int operator[](int index) const {
         return data[index];
     }
+
     int& operator[](int index) {
         return data[index];
     }
+
     friend ostream& operator<<(ostream& out, const Vector& m) {
         for (int i = 0; i < N; i++) {
             out << m.data[i] << (i == N - 1 ? "" : ", ");
