@@ -35,7 +35,7 @@ struct has_value_type : std::false_type {};
 template<typename T>
 struct has_value_type<T, void_t<typename T::value_type>> : std::true_type {};
 
-namespace v {
+namespace v1 {
     template<typename T>
     typename enable_if<has_size<T>::value && has_value_type<T>::value, size_t>::type
     getSize(const T & x) {
