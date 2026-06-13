@@ -5,6 +5,9 @@
 #include "EasyBMP.h"
 #include <complex>
 #include <chrono>
+#include <future>
+#include <vector>
+#include <thread>
 
 using namespace std;
 typedef complex<double> Complex;
@@ -71,7 +74,7 @@ int main( int argc, char* argv[] )
 
     auto iterationsToPixel = [](size_t numerOfIterations){
         RGBApixel pixel;
-        pixel.Blue = 0;
+        pixel.Blue = (ebmpBYTE) 0;
         pixel.Green = (ebmpBYTE) 0;
         pixel.Red = (ebmpBYTE) 0;
         if(numerOfIterations>0){
@@ -82,18 +85,60 @@ int main( int argc, char* argv[] )
         return pixel;
     };
 
+
+//------------------
+    auto worker = [&](unsigned yBegin, unsigned yEnd) {
+        for(unsigned y=yBegin; y<yEnd; y++){
+            for(unsigned x=0; x<imageWidth; x++){
+
+                Complex c = pixelToComplex(x, y);
+
+                auto numberOfIteration = MandelbrotSetIterations(c, maxNumberOfIteration, escapeThreshold);
+                auto pixel = iterationsToPixel(numberOfIteration);
+                Output.SetPixel(x,y,pixel) ;
+            }
+        }
+    };
+
+    unsigned numThreads = thread::hardware_concurrency();
+    unsigned rowsPerThread = imageHeight / numThreads;
+    std::vector<std::future<void>> tasks;
+    tasks.reserve(numThreads);
+
     auto start = std::chrono::steady_clock::now();
 
-    for(unsigned y=0; y<imageHeight; y++){
-        for(unsigned x=0; x<imageWidth; x++){
+     for(unsigned t = 0; t < numThreads; t++)
+     {
+         unsigned yBegin = t * rowsPerThread;
+         unsigned yEnd =
+             (t == numThreads - 1)
+             ? imageHeight
+             : yBegin + rowsPerThread;
 
-            Complex c = pixelToComplex(x, y);
+         tasks.push_back(
+                 std::async(
+                     std::launch::async,
+                     worker,
+                     yBegin,
+                     yEnd));
+     }
 
-            auto numberOfIteration = MandelbrotSetIterations(c, maxNumberOfIteration, escapeThreshold);
-            auto pixel = iterationsToPixel(numberOfIteration);
-            Output.SetPixel(x,y,pixel) ;
-        }
-    }
+     for(auto &task : tasks)
+     {
+         task.get();
+     }
+
+    // for(unsigned y=0; y<imageHeight; y++){
+    //     for(unsigned x=0; x<imageWidth; x++){
+    //
+    //         Complex c = pixelToComplex(x, y);
+    //
+    //         auto numberOfIteration = MandelbrotSetIterations(c, maxNumberOfIteration, escapeThreshold);
+    //         auto pixel = iterationsToPixel(numberOfIteration);
+    //         Output.SetPixel(x,y,pixel) ;
+    //     }
+    // }
+
     auto stop = std::chrono::steady_clock::now();
     cout << "Time used : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop-start).count() << " ms."<< endl;
     cout << "Bitmap written to " << fileName << "." << endl;
